@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pharma_go/pages/homepage.dart';
+import 'package:pharma_go/pages/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
        debugShowCheckedModeBanner: false,
 
      // title: 'Flutter Demo',
-      home: Homepage(),
+     // home: Homepage(),
+      home: LoginPage(),
     );
   }
 }

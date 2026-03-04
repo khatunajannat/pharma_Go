@@ -31,7 +31,7 @@ categories.add(
 
   CategoryModel(name: 'suppliments',
       icon: 'assets/icons/supplement.svg',
-      boxColor: Colors.orange)
+      boxColor: Colors.blue)
 );
 
 
@@ -46,9 +46,9 @@ categories.add(
 
 categories.add(
 
-    CategoryModel(name: 'Feminine hygiene',
+    CategoryModel(name: 'Feminine\n hygiene',
         icon: 'assets/icons/woman.svg',
-        boxColor: Colors.orange)
+        boxColor: Colors.blue)
 );
 
 

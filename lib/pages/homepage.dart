@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pharma_go/model/category_model.dart';
+import 'package:pharma_go/model/for_you_model.dart';
  
 class Homepage extends StatefulWidget {
    Homepage({super.key});
@@ -11,22 +12,24 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
 List<CategoryModel> categories=[];
-
+List<ForYouModel> forYou = [];
 void _getCategories(){
 
   categories = CategoryModel.getCategories();
 
 }
-@override
-void initState(){
 
-  _getCategories();
+void _getForYou(){
 
+  forYou = ForYouModel.getForYou();
 }
+
+
 
   @override
   Widget build(BuildContext context) {
   _getCategories();
+  _getForYou();
     return Scaffold(
       appBar: AppBar(
         //backgroundColor: Colors.indigo,
@@ -102,7 +105,7 @@ void initState(){
  //backgroundColor: Colors.white,
 
       body: Column(
-//crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           margin:EdgeInsets.only(top:20, left:15,right:15),
@@ -186,20 +189,61 @@ crossAxisAlignment:CrossAxisAlignment.start ,
             ),
             SizedBox(height:20),
             Container(
-              height: 150,
-              color: Colors.indigo,
-            child: ListView.builder(
+              height: 120,
+             // color: Colors.indigo,
+            //color : Colors.white,
+            child: ListView.separated(
             itemCount: categories.length,
                 scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(
+                  left:15,
+                  right:15,
+
+                ),
+                separatorBuilder: (context, index) => SizedBox(width: 25),
                 itemBuilder:(context,index){
                   return Container(
 
-                    //height: 50,
-                      width: 25,
+                     height: 50,
+                      width: 100,
                     decoration: BoxDecoration(
-                      color: categories[index].boxColor,
+                      color: categories[index].boxColor.withOpacity(.10),
+                      borderRadius: BorderRadius.circular(16),
 
                     ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                        Container(
+                         height: 65,
+                          width:65,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                       child: SvgPicture.asset(categories[index].icon),
+
+                        ),
+                        Text(
+
+                          categories[index].name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+
+                          ),
+
+
+                        ),
+
+
+
+                      ],
+
+                    ),
+
+
+
                   );
                 },
 
@@ -214,10 +258,145 @@ crossAxisAlignment:CrossAxisAlignment.start ,
           ],
         ),
 
+        SizedBox(height:15),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start ,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left:20),
+              child: Text('Recomendation\n'
+                'For you',
+                style: TextStyle(
+                  fontSize: 23,
+                  color: Color(0xff364fab),
+                  fontWeight: FontWeight.w500,
 
+                ),
+
+              ),
+            ),
+            SizedBox(height:15),
+            Padding(
+              padding: const EdgeInsets.only(
+                left:20,
+                right: 20,
+
+              ),
+              child: Container(
+                height:320,
+                //color: Colors.indigo[50],
+                //color:Colors.white,
+                child: ListView.separated(itemBuilder: (context,index){
+
+                  return Container(
+
+                    width:210 ,
+                    decoration: BoxDecoration(
+                     color: forYou[index].boxColor.withOpacity(0.10),
+                     borderRadius: BorderRadius.circular(16),
+
+                    ),
+
+                    child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                       (forYou[index].image),
+                        Padding(
+                          padding: const EdgeInsets.only(left:10,right:10),
+                          child: Text(
+                           forYou[index].product,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+
+                          ),
+                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(left:8.0,right:8.0),
+                      child: Text(
+                      forYou[index].text,
+
+                      ),
+
+                    ),
+                  SizedBox(height:5),
+                  Container(
+
+
+                 height: 30,
+                    width: 100,
+                decoration: BoxDecoration(
+                  color: Colors.pink[400],
+                  borderRadius: BorderRadius.circular(16),
+
+                ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Add to cart',
+                        style: TextStyle(
+
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+
+                        ),
+
+
+
+                      ),
+                    ],
+                  ),
+                   
+                  ),
+
+
+
+                      ],
+
+                    ),
+
+                  );
+
+                },
+                    separatorBuilder: (context,index)=>SizedBox(width:25),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: forYou.length),
+
+
+
+
+              ),
+            ),
+
+
+
+
+          ],
+        ),
       ],
 
+
       ),
+
+floatingActionButton: FloatingActionButton(onPressed: (){},
+
+    backgroundColor: Colors.pink[400],
+    child: Icon(Icons.shopping_cart,
+    color: Colors.white,
+
+    )
+
+),
+
+
+
+
+
+
+
+
 
 
 
