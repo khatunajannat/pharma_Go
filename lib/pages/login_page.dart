@@ -130,48 +130,50 @@ class LoginPage extends StatelessWidget {
             ),
 
             SizedBox(height: 50),
-            Container(
-              height: 40,
-              width: 120,
-              decoration: BoxDecoration(
-                color: Colors.indigo,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('Log-in', style: TextStyle(
-                    fontSize:18,
-                    color:Colors.white,
-                    fontWeight: FontWeight.w600,
 
-                  ),
-                              ),
+            TextButton(onPressed: (){
 
-                                 ],
+            },
+              child: Container(
+                height: 40,
+                width: 120,
+                decoration: BoxDecoration(
+                  color: Colors.indigo[900],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('Log-in', style: TextStyle(
+                      fontSize:18,
+                      color:Colors.white,
+                      fontWeight: FontWeight.w600,
+
+                    ),
+                                ),
+
+                                   ],
+                ),
               ),
             ),
             SizedBox(height:50),
-            Text(
-              'Forgot password ?',
-              style: TextStyle(
-                fontSize:15,
-                color: Colors.blue,
+            TextButton( onPressed :(){
+
+            } ,
+              child: Text(
+                'Forgot password ?',
+                style: TextStyle(
+                  fontSize:15,
+                  color: Colors.blue,
+
+                ),
+
 
               ),
-
-
             ),
 
-
-
-
-
           ],
-
-
-
 
         ),
       ),
