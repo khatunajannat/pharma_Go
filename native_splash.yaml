@@ -1,0 +1,10 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  web: true
+  color: "#364fab"
+  image: "assets/logos/pharma.png"
+
+  android_12:
+    color: "##364fab"
+    image: "assets/logos/pharma_crop.png"

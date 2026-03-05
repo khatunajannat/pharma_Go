@@ -23,8 +23,8 @@ static List<ForYouModel>  getForYou() {
   List<ForYouModel> forYou = [];
 forYou.add(
 ForYouModel(product: 'Napa Extend',
-    text: 'unit price : Tk.2.00\n,'
-        'Strip price: Tk. 24.00',
+    text: 'unit price : Tk.2.00\n'
+        'strip price: Tk. 24.00',
     image: Image.asset('assets/images/napa.png'),
 
   boxColor: Colors.blue,
@@ -33,7 +33,7 @@ ForYouModel(product: 'Napa Extend',
 
   forYou.add(
       ForYouModel(product: 'Nestle cerelac - wheat-rice-mixed fruit ',
-        text: ' price : Tk.370',
+        text: 'unit price : Tk.370',
         image: Image.asset('assets/images/cerelac.png'),
 
         boxColor: Colors.orange,
