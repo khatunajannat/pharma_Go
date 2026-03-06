@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-//import 'package:pharma_go/pages/nearby_store_page.dart';
-//import 'account_page.dart';
-//import 'cart_page.dart';
+import 'package:pharma_go/pages/nearby_store_page.dart';
+import 'account_page.dart';
+import 'cart_page.dart';
 import 'homepage.dart';
-//import 'orders_page.dart';
+import 'orders_page.dart';
 
 class HomePageBody extends StatefulWidget {
   const HomePageBody({super.key});
@@ -19,9 +19,9 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   final List<Widget> _pages = [
     Homepage(),
-   // NearbyStorePage(),
-   // OrdersPage(),
-   // AccountPage(),
+    NearbyStorePage(),
+    OrdersPage(),
+    AccountPage(),
   ];
 
   @override
@@ -92,8 +92,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                   backgroundColor: Color(0xff364fab),
                   foregroundColor: Colors.white,
                 ),
-                body: //CartPage(),
-
+                body: CartPage(),
               ),
             ),
           );
