@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pharma_go/pages/home_page_body.dart';
 import 'package:pharma_go/pages/homepage.dart';
+import 'package:pharma_go/pages/selection_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,9 +15,9 @@ class MyApp extends StatelessWidget {
     return  MaterialApp(
        debugShowCheckedModeBanner: false,
 
-     // title: 'Flutter Demo',
-     home: HomePageBody(),
-      //home: login_page(),
+     home: SelectionPage(),
+
+
     );
   }
 }

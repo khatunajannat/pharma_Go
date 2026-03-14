@@ -91,7 +91,6 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
 
-        // Total card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -110,7 +109,6 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
 
-        // Checkout button
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
           child: Container(

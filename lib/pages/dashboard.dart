@@ -45,7 +45,7 @@ class DashBoard extends StatelessWidget {
                           SizedBox(height: 10),
                           Text("\$5,129",
                               style: TextStyle(
-                                color: Color(0xFF10B981),
+                                color: Color(0XFFFF751F),
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               )),
@@ -104,7 +104,7 @@ class DashBoard extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 25),
                       decoration: BoxDecoration(
                         color: Colors.orange.withOpacity(0.10),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       child: Column(
                         children: [
@@ -148,6 +148,7 @@ class DashBoard extends StatelessWidget {
                       SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                         children: [
                           Padding(
                             padding: EdgeInsets.all(8.0),
@@ -155,11 +156,11 @@ class DashBoard extends StatelessWidget {
                               height: 60,
                               width: 90,
                               decoration: BoxDecoration(
-                                color: Color(0xFF10B981),
+                                color: Color(0xFF364fab),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(10.0),
+                                padding: EdgeInsets.only(top:15,left:12,right:10),
                                 child: Text("Accept",
                                     style: TextStyle(
                                       color: Colors.white,
@@ -175,11 +176,11 @@ class DashBoard extends StatelessWidget {
                               height: 60,
                               width: 90,
                               decoration: BoxDecoration(
-                                color: Color(0xFFEF4444),
+                                color: Color(0xFFFF751F),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(10.0),
+                                padding: EdgeInsets.only(top:15,left:15 , right:8),
                                 child: Text("Reject",
                                     style: TextStyle(
                                       color: Colors.white,

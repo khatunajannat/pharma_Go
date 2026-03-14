@@ -18,11 +18,11 @@ class orders extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
+                      blurRadius: 50,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -40,7 +40,7 @@ class orders extends StatelessWidget {
                         ),
                         title: Text('Napa jatio ousodh'),
                         subtitle: Text('Delivered',
-                            style: TextStyle(color: Color(0xFF10B981))),
+                            style: TextStyle(color: Color(0xFF364fab))),
                       ),
                     ],
                   ),
@@ -54,11 +54,11 @@ class orders extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.orange.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
+                      blurRadius: 50,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -90,11 +90,11 @@ class orders extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
+                      blurRadius: 50,
                       offset: const Offset(0, 4),
                     ),
                   ],

@@ -8,7 +8,7 @@ class Inventory extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.only(top:10,left:15, right:15),
         child: Column(
           children: [
             Container(
@@ -21,7 +21,7 @@ class Inventory extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
+                    blurRadius: 50,
                     offset: Offset(0, 2),
                   ),
                 ],
@@ -54,7 +54,7 @@ class Inventory extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(12.0),
               height: 100,
@@ -65,7 +65,7 @@ class Inventory extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
+                    blurRadius: 50,
                     offset: Offset(0, 2),
                   ),
                 ],
@@ -98,7 +98,7 @@ class Inventory extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(12.0),
               height: 100,
@@ -109,7 +109,7 @@ class Inventory extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
+                    blurRadius: 50,
                     offset: Offset(0, 2),
                   ),
                 ],
