@@ -26,7 +26,6 @@ class _AccountPageState extends State<AccountPage> {
         ),
         SizedBox(height: 20),
 
-        // Profile pic and name
         Center(
           child: Column(
             children: [
@@ -54,7 +53,6 @@ class _AccountPageState extends State<AccountPage> {
 
         SizedBox(height: 25),
 
-        // Name card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -80,7 +78,6 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
 
-        // Mobile number card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -106,7 +103,6 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
 
-        // Email card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -132,7 +128,6 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
 
-        // Address card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -158,7 +153,6 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
 
-        // Gender card
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
           child: Container(
@@ -176,7 +170,7 @@ class _AccountPageState extends State<AccountPage> {
                   children: [
                     Text('Gender', style: TextStyle(fontSize: 12, color: Colors.grey)),
                     SizedBox(height: 4),
-                    Text('Male', style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text('Female', style: TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
@@ -184,7 +178,6 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
 
-        // Logout button
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
           child: Container(
