@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home_page_body.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'home_page_body.dart';
 
 class SignupUserPage extends StatefulWidget {
   const SignupUserPage({super.key});
@@ -12,58 +12,75 @@ class SignupUserPage extends StatefulWidget {
 
 class _SignupUserPageState extends State<SignupUserPage> {
 
-final nameController = TextEditingController();
-final emailController = TextEditingController();
-final phoneController = TextEditingController();
-final addressController = TextEditingController();
-final ageController = TextEditingController();
-final passwordController = TextEditingController();
-final confirmPasswordController = TextEditingController();
+  final nameController     = TextEditingController();
+  final emailController    = TextEditingController();
+  final phoneController    = TextEditingController();
+  final addressController  = TextEditingController();
+  final ageController      = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmController  = TextEditingController();
 
+  bool isEmailValid = true;
+  bool isPasswordMatch = true;
 
-Future<void> signUp () async {
-  if (passwordController.text != confirmPasswordController.text) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
-    Text('Password did not match',
-    ),
-
-    ),
-    );
-    return;
+  // Email validation regex pattern
+  bool validateEmail(String email) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
   }
 
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+  Future<void> signUp() async {
+    // Validate email format
+    if (!validateEmail(emailController.text.trim())) {
+      setState(() {
+        isEmailValid = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid email format')),
+      );
+      return;
+    }
 
+    // Validate password match
+    if (passwordController.text != confirmController.text) {
+      setState(() {
+        isPasswordMatch = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
 
-    await FirebaseFirestore.instance
-        .collection('users').doc(userCredential.user!.uid)
-        .set({
-      'name': nameController.text.trim(),
-      'email': emailController.text.trim(),
-      'phone': phoneController.text.trim(),
-      'address': addressController.text.trim(),
-      'age': ageController.text.trim(),
-    });
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-    Navigator.push(
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'name':    nameController.text.trim(),
+        'email':   emailController.text.trim(),
+        'phone':   phoneController.text.trim(),
+        'address': addressController.text.trim(),
+        'age':     ageController.text.trim(),
+      });
+
+      Navigator.push(
         context,
-
         MaterialPageRoute(builder: (context) => HomePageBody()),
+      );
 
-    );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Signup failed')),
+      );
+    }
   }
- on FirebaseAuthException catch(e){
-
-   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message?? 'Signup failed ')));
-
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +145,7 @@ Future<void> signUp () async {
                 ],
               ),
               child: TextField(
-
-               controller : nameController,
-
+                controller: nameController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -169,19 +184,39 @@ Future<void> signUp () async {
               ),
               child: TextField(
                 controller: emailController,
+                onChanged: (value) {
+                  setState(() {
+                    if (value.isEmpty) {
+                      isEmailValid = true;
+                    } else {
+                      isEmailValid = validateEmail(value);
+                    }
+                  });
+                },
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.indigo[50],
+                  fillColor: isEmailValid ? Colors.indigo[50] : Colors.red[50],
                   hintText: 'Enter your e-mail here',
                   hintStyle: TextStyle(fontSize: 18),
                   contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isEmailValid ? Colors.transparent : Colors.red,
+                      width: isEmailValid ? 0 : 2,
+                    ),
                   ),
                 ),
               ),
             ),
+            if (!isEmailValid)
+              Padding(
+                padding: const EdgeInsets.only(left: 15, top: 8),
+                child: Text(
+                  'Invalid email format',
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
 
             SizedBox(height: 20),
 
@@ -223,7 +258,6 @@ Future<void> signUp () async {
 
             SizedBox(height: 20),
 
-            // Address
             Text(
               'Address',
               style: TextStyle(
@@ -245,9 +279,7 @@ Future<void> signUp () async {
                 ],
               ),
               child: TextField(
-
                 controller: addressController,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -287,8 +319,6 @@ Future<void> signUp () async {
               child: TextField(
                 controller: ageController,
                 keyboardType: TextInputType.number,
-
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -327,6 +357,15 @@ Future<void> signUp () async {
               ),
               child: TextField(
                 controller: passwordController,
+                onChanged: (value) {
+                  setState(() {
+                    if (confirmController.text.isEmpty) {
+                      isPasswordMatch = true;
+                    } else {
+                      isPasswordMatch = value == confirmController.text;
+                    }
+                  });
+                },
                 obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
@@ -365,22 +404,41 @@ Future<void> signUp () async {
                 ],
               ),
               child: TextField(
-
-                controller: confirmPasswordController,
+                controller: confirmController,
+                onChanged: (value) {
+                  setState(() {
+                    if (passwordController.text.isEmpty) {
+                      isPasswordMatch = true;
+                    } else {
+                      isPasswordMatch = value == passwordController.text;
+                    }
+                  });
+                },
                 obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.indigo[50],
+                  fillColor: isPasswordMatch ? Colors.indigo[50] : Colors.red[50],
                   hintText: 'Confirm your password',
                   hintStyle: TextStyle(fontSize: 18),
                   contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isPasswordMatch ? Colors.transparent : Colors.red,
+                      width: isPasswordMatch ? 0 : 2,
+                    ),
                   ),
                 ),
               ),
             ),
+            if (!isPasswordMatch)
+              Padding(
+                padding: const EdgeInsets.only(left: 15, top: 8),
+                child: Text(
+                  'Passwords do not match',
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
 
             SizedBox(height: 50),
 
@@ -388,7 +446,7 @@ Future<void> signUp () async {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: signUp ,
+                  onPressed: signUp,
                   child: Container(
                     height: 40,
                     width: 120,
@@ -422,4 +480,3 @@ Future<void> signUp () async {
     );
   }
 }
-

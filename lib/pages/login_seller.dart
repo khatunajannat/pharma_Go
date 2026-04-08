@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SellerLoginPage extends StatefulWidget {
   const SellerLoginPage({super.key});
@@ -24,10 +25,24 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
       return;
     }
     try {
+      UserCredential userCredential =
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      await FirebaseFirestore.instance
+          .collection('sellers')
+          .doc(userCredential.user!.uid)
+          .set({
+        'storeName': _storeNameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'licenseNumber': _licenseController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': 'seller',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Account created successfully!')),
       );
@@ -112,9 +127,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _storeNameController,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -156,9 +169,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _phoneController,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -200,9 +211,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _licenseController,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -244,9 +253,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _emailController,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -288,10 +295,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _passwordController,
-
-
                 obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
@@ -334,9 +338,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
-
                 controller: _confirmPasswordController,
-
                 obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
