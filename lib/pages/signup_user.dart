@@ -22,34 +22,47 @@ final confirmPasswordController = TextEditingController();
 
 
 Future<void> signUp () async {
-  if(passwordController.text!= confirmPasswordController.text){
-
+  if (passwordController.text != confirmPasswordController.text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
     Text('Password did not match',
     ),
 
     ),
     );
-    return ;
-
+    return;
   }
 
-  try{
-
+  try {
     UserCredential userCredential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
-  };
 
-await ;
+    await FirebaseFirestore.instance
+        .collection('users').doc(userCredential.user!.uid)
+        .set({
+      'name': nameController.text.trim(),
+      'email': emailController.text.trim(),
+      'phone': phoneController.text.trim(),
+      'address': addressController.text.trim(),
+      'age': ageController.text.trim(),
+    });
 
+    Navigator.push(
+        context,
+
+        MaterialPageRoute(builder: (context) => HomePageBody()),
+
+    );
+  }
+ on FirebaseAuthException catch(e){
+
+   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message?? 'Signup failed ')));
+
+  }
 }
-
-
-
-
 
 
   @override
@@ -115,6 +128,9 @@ await ;
                 ],
               ),
               child: TextField(
+
+               controller : nameController,
+
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -152,6 +168,7 @@ await ;
                 ],
               ),
               child: TextField(
+                controller: emailController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -189,6 +206,7 @@ await ;
                 ],
               ),
               child: TextField(
+                controller: phoneController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -227,6 +245,9 @@ await ;
                 ],
               ),
               child: TextField(
+
+                controller: addressController,
+
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -264,7 +285,10 @@ await ;
                 ],
               ),
               child: TextField(
+                controller: ageController,
                 keyboardType: TextInputType.number,
+
+
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -302,6 +326,8 @@ await ;
                 ],
               ),
               child: TextField(
+                controller: passwordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -339,6 +365,9 @@ await ;
                 ],
               ),
               child: TextField(
+
+                controller: confirmPasswordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -359,14 +388,7 @@ await ;
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePageBody(),
-                      ),
-                    );
-                  },
+                  onPressed: signUp ,
                   child: Container(
                     height: 40,
                     width: 120,
@@ -401,5 +423,3 @@ await ;
   }
 }
 
-class UserCredential {
-}
