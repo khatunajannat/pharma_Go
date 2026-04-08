@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SellerLoginPage extends StatefulWidget {
   const SellerLoginPage({super.key});
@@ -8,6 +10,49 @@ class SellerLoginPage extends StatefulWidget {
 }
 
 class _SellerLoginPageState extends State<SellerLoginPage> {
+  final _storeNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _licenseController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  Future<void> _signUp() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+    try {
+      UserCredential userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      await FirebaseFirestore.instance
+          .collection('sellers')
+          .doc(userCredential.user!.uid)
+          .set({
+        'storeName': _storeNameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'licenseNumber': _licenseController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': 'seller',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Account created successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign up failed: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +60,6 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
         child: ListView(
           children: [
             SizedBox(height: 20),
-
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -83,6 +127,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _storeNameController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -124,6 +169,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _phoneController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -139,7 +185,6 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
             ),
 
             SizedBox(height: 20),
-
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -166,6 +211,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _licenseController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -207,6 +253,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -248,6 +295,8 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _passwordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -289,6 +338,8 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
                 ],
               ),
               child: TextField(
+                controller: _confirmPasswordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -309,7 +360,7 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: _signUp,
                   child: Container(
                     height: 40,
                     width: 120,
@@ -337,7 +388,6 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
             ),
 
             SizedBox(height: 20),
-
           ],
         ),
       ),
