@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'home_page_body.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+
+  Future<void> _login() async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePageBody()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +96,7 @@ class LoginPage extends StatelessWidget {
                 ],
               ),
               child: TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -84,6 +114,7 @@ class LoginPage extends StatelessWidget {
             SizedBox(height: 20),
 
             Text(
+
               'Password',
               style: TextStyle(
                 fontSize: 18,
@@ -104,6 +135,10 @@ class LoginPage extends StatelessWidget {
                 ],
               ),
               child: TextField(
+
+                controller: _passwordController,
+                obscureText: true,
+
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
@@ -124,14 +159,7 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomePageBody(),
-                      ),
-                    );
-                  },
+                  onPressed: _login,
                   child: Container(
                     height: 40,
                     width: 120,
@@ -164,7 +192,9 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
+
                   onPressed: () {},
+
                   child: Text(
                     'Forgot password ?',
                     style: TextStyle(
