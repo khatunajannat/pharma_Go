@@ -1,8 +1,56 @@
 import 'package:flutter/material.dart';
 import 'home_page_body.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SignupUserPage extends StatelessWidget {
+class SignupUserPage extends StatefulWidget {
   const SignupUserPage({super.key});
+
+  @override
+  State<SignupUserPage> createState() => _SignupUserPageState();
+}
+
+class _SignupUserPageState extends State<SignupUserPage> {
+
+final nameController = TextEditingController();
+final emailController = TextEditingController();
+final phoneController = TextEditingController();
+final addressController = TextEditingController();
+final ageController = TextEditingController();
+final passwordController = TextEditingController();
+final confirmPasswordController = TextEditingController();
+
+
+Future<void> signUp () async {
+  if(passwordController.text!= confirmPasswordController.text){
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
+    Text('Password did not match',
+    ),
+
+    ),
+    );
+    return ;
+
+  }
+
+  try{
+
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+
+  };
+
+await ;
+
+}
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -351,4 +399,7 @@ class SignupUserPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class UserCredential {
 }
