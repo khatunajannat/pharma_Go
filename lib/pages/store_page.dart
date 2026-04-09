@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../model/store_model.dart';
 import 'cart_page.dart';
 
@@ -13,14 +15,83 @@ class StorePage extends StatefulWidget {
 
 class _StorePageState extends State<StorePage> {
   List<StoreItemModel> items = [];
+  bool _isLoading = true;
 
-  void _getStoreItems() {
-    items = StoreItemModel.getStoreItems();
+  @override
+  void initState() {
+    super.initState();
+    _seedAndFetch();
+  }
+
+  Future<void> _seedAndFetch() async {
+    final col = FirebaseFirestore.instance.collection('products');
+    final existing = await col.get();
+
+    if (existing.docs.isEmpty) {
+      for (final data in StoreItemModel.seedData()) {
+        await col.add(data);
+      }
+    }
+
+    final snapshot = await col.get();
+    setState(() {
+      items = snapshot.docs
+          .map((doc) => StoreItemModel.fromFirestore(doc.id, doc.data()))
+          .toList();
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _addToCart(StoreItemModel item) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('cart');
+
+    final existing = await cartRef
+        .where('product', isEqualTo: item.product)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${item.product} is already in cart')),
+      );
+      return;
+    }
+
+    await cartRef.add({
+      'product': item.product,
+      'price': item.price,
+      'priceValue': item.priceValue,
+      'quantity': '1 unit',
+      'imageKey': item.id.isNotEmpty
+          ? _imageKeyFromProduct(item.product)
+          : 'napa',
+      'colorIndex': item.boxColor == Colors.blue ? 0 : 1,
+      'addedAt': FieldValue.serverTimestamp(),
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.product} added to cart')),
+    );
+  }
+
+  String _imageKeyFromProduct(String product) {
+    if (product.contains('Napa')) return 'napa';
+    if (product.contains('Cerelac')) return 'cerelac';
+    if (product.contains('Snail') || product.contains('COSRX')) return 'snail';
+    if (product.contains('Whisper')) return 'whisper';
+    return 'napa';
   }
 
   @override
   Widget build(BuildContext context) {
-    _getStoreItems();
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,28 +162,20 @@ class _StorePageState extends State<StorePage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(items[index].product, style: TextStyle(fontWeight: FontWeight.w600)),
+                        Text(items[index].product,
+                            style: TextStyle(fontWeight: FontWeight.w600)),
                         SizedBox(height: 4),
-                        Text(items[index].category, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text(items[index].category,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey)),
                         SizedBox(height: 4),
-                        Text(items[index].price, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                        Text(items[index].price,
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500)),
                         SizedBox(height: 6),
                         TextButton(
-                          onPressed: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Scaffold(
-                                  appBar: AppBar(
-                                    title: Text('My Cart'),
-                                    backgroundColor: Color(0xff364fab),
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  body: CartPage(),
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: () => _addToCart(items[index]),
                           child: Container(
                             height: 30,
                             width: 100,
@@ -123,7 +186,10 @@ class _StorePageState extends State<StorePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Add to cart', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                Text('Add to cart',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600)),
                               ],
                             ),
                           ),

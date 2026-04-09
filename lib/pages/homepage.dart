@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pharma_go/model/category_model.dart';
 import 'package:pharma_go/model/for_you_model.dart';
-
 import 'cart_page.dart';
 
 class Homepage extends StatefulWidget {
@@ -16,18 +17,78 @@ class _HomepageState extends State<Homepage> {
   List<CategoryModel> categories = [];
   List<ForYouModel> forYou = [];
 
-  void _getCategories() {
+  @override
+  void initState() {
+    super.initState();
     categories = CategoryModel.getCategories();
+    forYou = ForYouModel.getForYou();
   }
 
-  void _getForYou() {
-    forYou = ForYouModel.getForYou();
+  Future<void> _addToCart(ForYouModel item) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('cart');
+
+    final existing = await cartRef
+        .where('product', isEqualTo: item.product)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${item.product} is already in cart')),
+      );
+      return;
+    }
+
+    await cartRef.add({
+      'product': item.product,
+      'price': item.text.contains('strip')
+          ? _extractStripPrice(item.text)
+          : _extractUnitPrice(item.text),
+      'priceValue': _extractPriceValue(item.text),
+      'quantity': '1 unit',
+      'imageKey': _imageKeyFromProduct(item.product),
+      'colorIndex': item.boxColor == Colors.blue ? 0 : 1,
+      'addedAt': FieldValue.serverTimestamp(),
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.product} added to cart')),
+    );
+  }
+
+  String _extractUnitPrice(String text) {
+    final match = RegExp(r'Tk[\.\s]*([\d\.]+)').firstMatch(text);
+    if (match != null) return 'Tk. ${match.group(1)}';
+    return 'Tk. 0.00';
+  }
+
+  String _extractStripPrice(String text) {
+    final match = RegExp(r'strip price[:\s]*Tk[\.\s]*([\d\.]+)', caseSensitive: false).firstMatch(text);
+    if (match != null) return 'Tk. ${match.group(1)}';
+    return _extractUnitPrice(text);
+  }
+
+  double _extractPriceValue(String text) {
+    final match = RegExp(r'Tk[\.\s]*([\d\.]+)').firstMatch(text);
+    if (match != null) return double.tryParse(match.group(1) ?? '0') ?? 0.0;
+    return 0.0;
+  }
+
+  String _imageKeyFromProduct(String product) {
+    if (product.contains('Napa')) return 'napa';
+    if (product.contains('Cerelac') || product.contains('cerelac')) return 'cerelac';
+    if (product.contains('Snail') || product.contains('COSRX')) return 'snail';
+    if (product.contains('Whisper')) return 'whisper';
+    return 'napa';
   }
 
   @override
   Widget build(BuildContext context) {
-    _getCategories();
-    _getForYou();
     return ListView(
       children: [
         Container(
@@ -45,10 +106,8 @@ class _HomepageState extends State<Homepage> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.indigo[50],
-              //fillColor: Colors.white,
               hintText: 'Search  medicines',
               hintStyle: TextStyle(fontSize: 18),
-
               contentPadding: EdgeInsets.all(15),
               prefixIcon: Icon(Icons.search),
               suffixIcon: Container(
@@ -63,18 +122,14 @@ class _HomepageState extends State<Homepage> {
                         endIndent: 10,
                         thickness: 2,
                       ),
-
                       TextButton(
                         onPressed: () {},
-
                         child: Icon(Icons.qr_code_scanner_rounded, size: 40),
                       ),
-                      // SizedBox(width:10),
                     ],
                   ),
                 ),
               ),
-
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide.none,
@@ -100,8 +155,6 @@ class _HomepageState extends State<Homepage> {
             SizedBox(height: 20),
             Container(
               height: 120,
-              // color: Colors.indigo,
-              //color : Colors.white,
               child: ListView.separated(
                 itemCount: categories.length,
                 scrollDirection: Axis.horizontal,
@@ -135,12 +188,10 @@ class _HomepageState extends State<Homepage> {
                     ),
                   );
                 },
-
               ),
             ),
           ],
         ),
-
         SizedBox(height: 15),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +200,7 @@ class _HomepageState extends State<Homepage> {
               padding: const EdgeInsets.only(left: 20),
               child: Text(
                 'Recomendation\n'
-                'For you',
+                    'For you',
                 style: TextStyle(
                   fontSize: 23,
                   color: Color(0xff364fab),
@@ -162,8 +213,6 @@ class _HomepageState extends State<Homepage> {
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Container(
                 height: 330,
-                //color: Colors.indigo[50],
-                //color:Colors.white,
                 child: ListView.separated(
                   itemBuilder: (context, index) {
                     return Container(
@@ -172,12 +221,11 @@ class _HomepageState extends State<Homepage> {
                         color: forYou[index].boxColor.withOpacity(0.10),
                         borderRadius: BorderRadius.circular(16),
                       ),
-
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          (forYou[index].image),
+                          forYou[index].image,
                           Padding(
                             padding: const EdgeInsets.only(left: 10, right: 10),
                             child: Text(
@@ -186,29 +234,12 @@ class _HomepageState extends State<Homepage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(
-                              left: 8.0,
-                              right: 8.0,
-                            ),
+                            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                             child: Text(forYou[index].text),
                           ),
                           SizedBox(height: 5),
                           TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Scaffold(
-                                    appBar: AppBar(
-                                      title: Text('My Cart'),
-                                      backgroundColor: Color(0xff364fab),
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    body: CartPage(),
-                                  ),
-                                ),
-                              );
-                            },
+                            onPressed: () => _addToCart(forYou[index]),
                             child: Container(
                               height: 30,
                               width: 100,
