@@ -1,19 +1,35 @@
 import 'package:flutter/material.dart';
-import 'signup_selection_page.dart';
-import 'login_page.dart';
-import 'login_s.dart';
+import 'signup_user.dart';
+import 'login_seller.dart';
 
-class SelectionPage extends StatefulWidget {
-  const SelectionPage({super.key});
+class SignupSelectionPage extends StatefulWidget {
+  const SignupSelectionPage({super.key});
 
   @override
-  State<SelectionPage> createState() => _SelectionPageState();
+  State<SignupSelectionPage> createState() => _SignupSelectionPageState();
 }
 
-class _SelectionPageState extends State<SelectionPage> {
+class _SignupSelectionPageState extends State<SignupSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Color(0xff364fab)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Sign Up',
+          style: TextStyle(
+            color: Color(0xff364fab),
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: ListView(
           children: [
@@ -49,7 +65,7 @@ class _SelectionPageState extends State<SelectionPage> {
 
             SizedBox(height: 15),
             Text(
-              'Welcome to pharmaGo, continue as....',
+              'Create your account as....',
               style: TextStyle(color: Colors.indigo, fontSize: 18),
               textAlign: TextAlign.center,
             ),
@@ -59,7 +75,7 @@ class _SelectionPageState extends State<SelectionPage> {
             Padding(
               padding: const EdgeInsets.only(left: 20, bottom: 15),
               child: Text(
-                'Login',
+                'Sign Up',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -82,11 +98,11 @@ class _SelectionPageState extends State<SelectionPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.person_outline, color: Color(0xff364fab), size: 40),
+                        Icon(Icons.person_add_outlined, color: Color(0xff364fab), size: 40),
                         SizedBox(height: 8),
                         Text('User', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Color(0xff364fab))),
                         SizedBox(height: 4),
-                        Text('Buy medicines and\nhealthcare products', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                        Text('Create a new\nuser account', style: TextStyle(fontSize: 13, color: Colors.grey)),
                       ],
                     ),
                     TextButton(
@@ -94,7 +110,7 @@ class _SelectionPageState extends State<SelectionPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginPage(),
+                            builder: (context) => SignupUserPage(),
                           ),
                         );
                       },
@@ -108,7 +124,7 @@ class _SelectionPageState extends State<SelectionPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Login as User', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
+                            Text('Sign up as User', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
@@ -119,7 +135,7 @@ class _SelectionPageState extends State<SelectionPage> {
             ),
 
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.orange.withOpacity(0.10),
@@ -132,11 +148,11 @@ class _SelectionPageState extends State<SelectionPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.store_outlined, color: Color(0xffff751f), size: 40),
+                        Icon(Icons.store_mall_directory_outlined, color: Color(0xffff751f), size: 40),
                         SizedBox(height: 8),
                         Text('Seller', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Color(0xffff751f))),
                         SizedBox(height: 4),
-                        Text('Manage your pharmacy\nand sell products', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                        Text('Register your\npharmacy store', style: TextStyle(fontSize: 13, color: Colors.grey)),
                       ],
                     ),
                     TextButton(
@@ -144,7 +160,7 @@ class _SelectionPageState extends State<SelectionPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginPageS(),
+                            builder: (context) => SellerSignupPage(),
                           ),
                         );
                       },
@@ -158,48 +174,12 @@ class _SelectionPageState extends State<SelectionPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Login as Seller', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
+                            Text('Sign up as Seller', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-
-            SizedBox(height: 60),
-
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SignupSelectionPage(),
-                    ),
-                  );
-                },
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.indigo[900],
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'New here? Sign up',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),

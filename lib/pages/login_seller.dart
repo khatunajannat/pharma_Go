@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'seller_home_page_body.dart';
 
-class SellerLoginPage extends StatefulWidget {
-  const SellerLoginPage({super.key});
+class SellerSignupPage extends StatefulWidget {
+  const SellerSignupPage({super.key});
 
   @override
-  State<SellerLoginPage> createState() => _SellerLoginPageState();
+  State<SellerSignupPage> createState() => _SellerSignupPageState();
 }
 
-class _SellerLoginPageState extends State<SellerLoginPage> {
+class _SellerSignupPageState extends State<SellerSignupPage> {
+
   final _storeNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _licenseController = TextEditingController();
@@ -17,23 +20,46 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
   final _confirmPasswordController = TextEditingController();
 
   Future<void> _signUp() async {
+
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
+
     try {
+
+      UserCredential userCredential =
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'storeName': _storeNameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'licenseNumber': _licenseController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': 'seller',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Account created successfully!')),
+        SnackBar(content: Text('Seller account created successfully!')),
       );
-    } catch (e) {
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => SellerHomePageBody()),
+      );
+
+    } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign up failed: ${e.toString()}')),
+        SnackBar(content: Text(e.message ?? 'Signup failed')),
       );
     }
   }
@@ -44,83 +70,64 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
       body: SafeArea(
         child: ListView(
           children: [
+
             SizedBox(height: 20),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'pharma',
-                        style: TextStyle(
-                          color: Color(0xff364fab),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                        ),
+            Center(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'pharma',
+                      style: TextStyle(
+                        color: Color(0xff364fab),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
                       ),
-                      TextSpan(
-                        text: 'Go',
-                        style: TextStyle(
-                          color: Color(0xffff751f),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                        ),
+                    ),
+                    TextSpan(
+                      text: 'Go',
+                      style: TextStyle(
+                        color: Color(0xffff751f),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
 
             SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Welcome to pharmaGo, Log-in as Seller....',
-                  style: TextStyle(color: Colors.indigo, fontSize: 18),
-                ),
-              ],
+
+            Center(
+              child: Text(
+                'Register as a Seller',
+                style: TextStyle(color: Colors.indigo, fontSize: 18),
+              ),
             ),
 
             SizedBox(height: 20),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Store Name',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("Store Name",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: TextField(
 
+            SizedBox(height: 5),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
                 controller: _storeNameController,
-
                 decoration: InputDecoration(
+                  hintText: "Enter Store Name",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter your store name',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -129,42 +136,27 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Phone Number',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("Phone Number",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: TextField(
 
+            SizedBox(height: 5),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
                 controller: _phoneController,
-
                 decoration: InputDecoration(
+                  hintText: "Enter Phone Number",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter your phone number',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -173,42 +165,27 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'License Number',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("License Number",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: TextField(
 
+            SizedBox(height: 5),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
                 controller: _licenseController,
-
                 decoration: InputDecoration(
+                  hintText: "Enter License Number",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter your license number',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -217,42 +194,27 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'E-mail',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("E-mail",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: TextField(
 
+            SizedBox(height: 5),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
                 controller: _emailController,
-
                 decoration: InputDecoration(
+                  hintText: "Enter E-mail",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter your e-mail here',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -261,44 +223,28 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Password',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("Password",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: TextField(
 
+            SizedBox(height: 5),
+
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 15),
+              child: TextField(
                 controller: _passwordController,
-
-
                 obscureText: true,
                 decoration: InputDecoration(
+                  hintText: "Enter Password",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter the password',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -307,43 +253,28 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
               ),
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 15),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Confirm Password',
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text("Confirm Password",
                   style: TextStyle(
-                    color: Colors.indigo,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                      color: Colors.indigo,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600)),
             ),
+
+            SizedBox(height: 5),
+
             Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
+              margin: EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
-
                 controller: _confirmPasswordController,
-
                 obscureText: true,
                 decoration: InputDecoration(
+                  hintText: "Confirm Password",
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Confirm your password',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -354,35 +285,28 @@ class _SellerLoginPageState extends State<SellerLoginPage> {
 
             SizedBox(height: 40),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: _signUp,
-                  child: Container(
-                    height: 40,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: Color(0xffff751f),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+            Center(
+              child: TextButton(
+                onPressed: _signUp,
+                child: Container(
+                  height: 45,
+                  width: 140,
+                  decoration: BoxDecoration(
+                    color: Color(0xffff751f),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
 
             SizedBox(height: 20),

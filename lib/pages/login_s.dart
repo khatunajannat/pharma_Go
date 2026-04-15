@@ -1,9 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pharma_go/pages/seller_home_page_body.dart';
 
-
-class LoginPageS extends StatelessWidget {
+class LoginPageS extends StatefulWidget {
   const LoginPageS({super.key});
+
+  @override
+  State<LoginPageS> createState() => _LoginPageSState();
+}
+
+class _LoginPageSState extends State<LoginPageS> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  Future<void> _loginSeller() async {
+    try {
+      UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      String uid = userCredential.user!.uid;
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      if (!userDoc.exists) {
+        throw Exception("User data not found");
+      }
+
+      String role = userDoc['role'];
+
+      if (role == 'seller') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SellerHomePageBody(),
+          ),
+        );
+      } else {
+        await FirebaseAuth.instance.signOut();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Access denied: Not a seller")),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = "Login failed";
+
+      if (e.code == 'user-not-found') {
+        message = "No user found for this email";
+      } else if (e.code == 'wrong-password') {
+        message = "Incorrect password";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,34 +109,28 @@ class LoginPageS extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 15),
-
-            Text(
-              'E-mail',
-              style: TextStyle(
-                color: Colors.indigo,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
+            Row(
+              children: [
+                SizedBox(width: 20,),
+                Text(
+                  'E-mail',
+                  style: TextStyle(
+                    color: Colors.indigo,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
             Container(
               margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
               child: TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
                   hintText: 'Enter your e-mail here',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -81,36 +138,30 @@ class LoginPageS extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: 20),
-
-            Text(
-              'Password',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.indigo,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
+            Row(
+              children: [
+                SizedBox(width:20,),
+                Text(
+                  'Password',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.indigo,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
             Container(
               margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
               child: TextField(
+                controller: _passwordController,
+                obscureText: true,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
                   hintText: 'Enter the password',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -118,21 +169,12 @@ class LoginPageS extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: 50),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SellerHomePageBody(),
-                      ),
-                    );
-                  },
+                  onPressed: _loginSeller,
                   child: Container(
                     height: 40,
                     width: 120,
@@ -140,28 +182,21 @@ class LoginPageS extends StatelessWidget {
                       color: Colors.indigo[900],
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Log-in',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                    child: Center(
+                      child: Text(
+                        'Log-in',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-
             SizedBox(height: 30),
-
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -177,8 +212,6 @@ class LoginPageS extends StatelessWidget {
                 ),
               ],
             ),
-
-            SizedBox(height: 20),
           ],
         ),
       ),

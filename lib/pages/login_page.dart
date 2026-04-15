@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_page_body.dart';
 
 class LoginPage extends StatefulWidget {
@@ -10,25 +11,39 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-
   Future<void> _login() async {
     try {
+      UserCredential userCredential =
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomePageBody()),
-      );
+      String uid = userCredential.user!.uid;
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+
+      if (userDoc.exists && userDoc['role'] == 'user') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePageBody()),
+        );
+      } else {
+        await FirebaseAuth.instance.signOut();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Access denied')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: ${e.toString()}')),
+        SnackBar(content: Text('Login failed')),
       );
     }
   }
@@ -39,10 +54,10 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: ListView(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Text.rich(
                   TextSpan(
                     children: [
@@ -67,42 +82,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-            SizedBox(height: 15),
-            Text(
-              'Welcome to pharmaGo ,Log-in to continue.... \n',
-              style: TextStyle(color: Colors.indigo, fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 15),
-
-            Text(
-              'E-mail',
-              style: TextStyle(
-                color: Colors.indigo,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const SizedBox(height: 30),
             Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
+              margin: const EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter your e-mail here',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
+                  hintText: 'Email',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -110,41 +98,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-
-            SizedBox(height: 20),
-
-            Text(
-
-              'Password',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.indigo,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const SizedBox(height: 20),
             Container(
-              margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFC5CAE9FF).withOpacity(0.25),
-                    blurRadius: 30,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
+              margin: const EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
-
                 controller: _passwordController,
                 obscureText: true,
-
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.indigo[50],
-                  hintText: 'Enter the password',
-                  hintStyle: TextStyle(fontSize: 18),
-                  contentPadding: EdgeInsets.all(15),
+                  hintText: 'Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -152,61 +115,30 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-
-            SizedBox(height: 50),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: _login,
-                  child: Container(
-                    height: 40,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.indigo[900],
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Log-in',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+            const SizedBox(height: 40),
+            Center(
+              child: GestureDetector(
+                onTap: _login,
+                child: Container(
+                  height: 45,
+                  width: 140,
+                  decoration: BoxDecoration(
+                    color: Colors.indigo[900],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Log In',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-
-            SizedBox(height: 30),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-
-                  onPressed: () {},
-
-                  child: Text(
-                    'Forgot password ?',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 20),
           ],
         ),
       ),
